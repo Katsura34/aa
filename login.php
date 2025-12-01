@@ -14,23 +14,16 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 // Sanitize and validate inputs
 $username = isset($_POST["username"]) ? sanitize($_POST["username"]) : '';
 $password = isset($_POST["password"]) ? $_POST["password"] : '';
-$role     = isset($_POST["role"]) ? sanitize($_POST["role"]) : '';
 
 // Validate inputs
-if (empty($username) || empty($password) || empty($role)) {
+if (empty($username) || empty($password)) {
     echo "<script>alert('All fields are required!'); window.location='login.html';</script>";
     exit;
 }
 
-// Validate role
-if (!in_array($role, ['admin', 'customer'])) {
-    echo "<script>alert('Invalid role selected!'); window.location='login.html';</script>";
-    exit;
-}
-
-$sql = "SELECT * FROM users WHERE username = ? AND role = ?";
+$sql = "SELECT * FROM users WHERE username = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ss", $username, $role);
+$stmt->bind_param("s", $username);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -49,7 +42,7 @@ if ($result->num_rows === 1) {
         // Set session timeout (30 minutes)
         $_SESSION["timeout"] = time() + (30 * 60);
 
-        if ($role === "admin") {
+        if ($user["role"] === "admin") {
             header("Location: admin_dashboard.php");
         } else {
             header("Location: customer_home.php");

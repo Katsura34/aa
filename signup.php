@@ -12,10 +12,12 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 $username = isset($_POST["username"]) ? sanitize($_POST["username"]) : '';
 $email    = isset($_POST["email"]) ? sanitize($_POST["email"]) : '';
 $password = isset($_POST["password"]) ? $_POST["password"] : '';
-$role     = isset($_POST["role"]) ? sanitize($_POST["role"]) : '';
+
+// Default role is customer for all new registrations
+$role = 'customer';
 
 // Validate inputs
-if (empty($username) || empty($email) || empty($password) || empty($role)) {
+if (empty($username) || empty($email) || empty($password)) {
     echo "<script>alert('All fields are required!'); window.location='login.html';</script>";
     exit;
 }
@@ -23,12 +25,6 @@ if (empty($username) || empty($email) || empty($password) || empty($role)) {
 // Validate email
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo "<script>alert('Invalid email format!'); window.location='login.html';</script>";
-    exit;
-}
-
-// Validate role
-if (!in_array($role, ['admin', 'customer'])) {
-    echo "<script>alert('Invalid role selected!'); window.location='login.html';</script>";
     exit;
 }
 
