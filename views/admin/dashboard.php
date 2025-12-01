@@ -58,7 +58,7 @@ requireAdmin();
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                     Menu Management
                 </button>
-                <button data-view="sales-report" class="nav-link active w-full flex items-center p-3 rounded-xl transition duration-150 text-gray-800 active bg-blue-600 text-white">
+                <button data-view="sales-report" class="nav-link active w-full flex items-center p-3 rounded-xl transition duration-150 bg-blue-600 text-white">
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m18 0V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12m14 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10m16 4h2m-2-4h-2m-4 0h-2m4 4h2"></path></svg>
                     Sales Report
                 </button>
@@ -130,10 +130,10 @@ requireAdmin();
                 </header>
     
                 <div class="flex justify-center space-x-4 mb-12">
-                    <button id="pending-tab" onclick="setActiveTab('PENDING')" class="tab-button px-6 py-3 text-lg font-medium text-black-600 bg-white rounded-full shadow-md transition duration-300 ease-in-out active hover:bg-gray-50">
+                    <button id="pending-tab" onclick="setActiveTab('PENDING')" class="tab-button px-6 py-3 text-lg font-medium text-gray-600 bg-white rounded-full shadow-md transition duration-300 ease-in-out active hover:bg-gray-50">
                         Pending Orders
                     </button>
-                    <button id="completed-tab" onclick="setActiveTab('COMPLETED')" class="tab-button px-6 py-3 text-lg font-medium text-black-600 bg-white rounded-full shadow-md transition duration-300 ease-in-out hover:bg-gray-50">
+                    <button id="completed-tab" onclick="setActiveTab('COMPLETED')" class="tab-button px-6 py-3 text-lg font-medium text-gray-600 bg-white rounded-full shadow-md transition duration-300 ease-in-out hover:bg-gray-50">
                         Completed Orders
                     </button>
                 </div>

@@ -8,7 +8,10 @@ const categoryFilters = document.querySelectorAll('.category-filter');
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    document.getElementById('logout-button').addEventListener('click', handleLogout);
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', handleLogout);
+    }
     navLinks.forEach(link => {
         link.addEventListener('click', handleViewChange);
     });
@@ -54,7 +57,7 @@ function handleViewChange(e) {
 
     
     const titleMap = { 'menu': 'Today\'s Menu', 'cart': 'Your Current Order', 'orders': 'My Orders' };
-    const subtitleMap = { 'menu': 'Fresh food prepared daily for our students.', 'cart': 'Review and finalize your items before checkout.', 'orders': 'View your past and pending orders.' };
+    const subtitleMap = { 'menu': 'Fresh food prepared daily for our customers.', 'cart': 'Review and finalize your items before checkout.', 'orders': 'View your past and pending orders.' };
     document.getElementById('content-title').textContent = titleMap[newView];
     document.getElementById('content-subtitle').textContent = subtitleMap[newView];
 
