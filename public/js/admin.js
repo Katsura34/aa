@@ -6,6 +6,7 @@
 // State variables
 let menuItems = [];
 let orders = [];
+let users = [];
 let currentTab = 'PENDING';
 
 // DOM Elements
@@ -22,6 +23,8 @@ const pendingTabButton = document.getElementById('pending-tab');
 const completedTabButton = document.getElementById('completed-tab');
 const noOrdersMessage = document.getElementById('no-orders-message');
 const menuList = document.getElementById('menu-list');
+const usersList = document.getElementById('users-list');
+const noUsersMessage = document.getElementById('no-users-message');
 
 // API Base URL
 const API_BASE = '../api';
@@ -42,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchMenuItems();
     fetchSalesReport(reportDateInput.value);
     fetchOrders();
+    fetchUsers();
 });
 
 // --- API Functions ---
@@ -161,6 +165,80 @@ async function updateOrderStatus(orderId, status) {
     }
 }
 
+// --- User Management API Functions ---
+
+async function fetchUsers() {
+    try {
+        const response = await fetch(`${API_BASE}/get_users.php`);
+        const data = await response.json();
+        if (data.success) {
+            users = data.data;
+            renderUsers();
+        }
+    } catch (error) {
+        console.error('Error fetching users:', error);
+    }
+}
+
+async function addUserToDb(userData) {
+    try {
+        const response = await fetch(`${API_BASE}/add_user.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert('User added successfully!');
+            fetchUsers();
+            closeAddUserModal();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error adding user:', error);
+    }
+}
+
+async function updateUserInDb(id, userData) {
+    try {
+        const response = await fetch(`${API_BASE}/update_user.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, ...userData })
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert('User updated successfully!');
+            fetchUsers();
+            closeEditUserModal();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error updating user:', error);
+    }
+}
+
+async function deleteUserFromDb(id) {
+    try {
+        const response = await fetch(`${API_BASE}/delete_user.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert('User deleted successfully!');
+            fetchUsers();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error deleting user:', error);
+    }
+}
+
 // --- View Management ---
 
 function handleViewChangeAdmin(e) {
@@ -186,12 +264,14 @@ function handleViewChangeAdmin(e) {
     const titleMap = { 
         'orders': 'Order Management', 
         'menu-management': 'Menu & Inventory', 
-        'sales-report': 'Sales Report' 
+        'sales-report': 'Sales Report',
+        'manage-users': 'Manage Users'
     };
     const subtitleMap = { 
         'orders': 'Manage incoming and completed orders.', 
         'menu-management': 'Manage food items, prices, and stock levels.', 
-        'sales-report': 'Overview of daily sales, revenue, and top-performing items.' 
+        'sales-report': 'Overview of daily sales, revenue, and top-performing items.',
+        'manage-users': 'Add, edit, and manage user accounts.'
     };
     document.getElementById('content-title-admin').textContent = titleMap[newView];
     document.getElementById('content-subtitle-admin').textContent = subtitleMap[newView];
@@ -203,6 +283,8 @@ function handleViewChangeAdmin(e) {
         fetchOrders();
     } else if (newView === 'menu-management') {
         fetchMenuItems();
+    } else if (newView === 'manage-users') {
+        fetchUsers();
     }
 }
 
@@ -429,5 +511,120 @@ window.updateItem = function() {
 window.deleteItem = function(id) {
     if (confirm("Are you sure you want to delete this menu item?")) {
         deleteMenuItem(id);
+    }
+}
+
+// --- User Management Rendering and Functions ---
+
+function renderUsers() {
+    usersList.innerHTML = '';
+    
+    if (users.length === 0) {
+        noUsersMessage.classList.remove('hidden');
+    } else {
+        noUsersMessage.classList.add('hidden');
+        users.forEach(user => {
+            const roleClass = user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700';
+            const createdDate = new Date(user.created_at).toLocaleDateString();
+            
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50 transition duration-100';
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.id}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${user.username}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.email}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${roleClass} capitalize">
+                        ${user.role}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${createdDate}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                    <button onclick="editUser(${user.id})" class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Edit</button>
+                    <button onclick="deleteUser(${user.id})" class="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">Delete</button>
+                </td>
+            `;
+            usersList.appendChild(row);
+        });
+    }
+}
+
+// User Modal Functions
+window.openAddUserModal = function() {
+    document.getElementById('add-user-modal').classList.remove('hidden');
+}
+
+window.closeAddUserModal = function() {
+    document.getElementById('user-username').value = '';
+    document.getElementById('user-email').value = '';
+    document.getElementById('user-password').value = '';
+    document.getElementById('user-role').value = 'customer';
+    document.getElementById('add-user-modal').classList.add('hidden');
+}
+
+window.openEditUserModal = function() {
+    document.getElementById('edit-user-modal').classList.remove('hidden');
+}
+
+window.closeEditUserModal = function() {
+    document.getElementById('edit-user-id').value = '';
+    document.getElementById('edit-user-username').value = '';
+    document.getElementById('edit-user-email').value = '';
+    document.getElementById('edit-user-password').value = '';
+    document.getElementById('edit-user-role').value = 'customer';
+    document.getElementById('edit-user-modal').classList.add('hidden');
+}
+
+// User CRUD Functions
+window.addUser = function() {
+    const username = document.getElementById('user-username').value;
+    const email = document.getElementById('user-email').value;
+    const password = document.getElementById('user-password').value;
+    const role = document.getElementById('user-role').value;
+
+    if (!username || !email || !password) {
+        alert("Username, email, and password are required!");
+        return;
+    }
+
+    addUserToDb({ username, email, password, role });
+}
+
+window.editUser = function(id) {
+    const user = users.find(u => u.id === id);
+    if (!user) return;
+
+    document.getElementById('edit-user-id').value = user.id;
+    document.getElementById('edit-user-username').value = user.username;
+    document.getElementById('edit-user-email').value = user.email;
+    document.getElementById('edit-user-password').value = '';
+    document.getElementById('edit-user-role').value = user.role;
+    
+    openEditUserModal();
+}
+
+window.updateUser = function() {
+    const id = parseInt(document.getElementById('edit-user-id').value);
+    const username = document.getElementById('edit-user-username').value;
+    const email = document.getElementById('edit-user-email').value;
+    const password = document.getElementById('edit-user-password').value;
+    const role = document.getElementById('edit-user-role').value;
+
+    if (!username || !email) {
+        alert("Username and email are required!");
+        return;
+    }
+
+    const userData = { username, email, role };
+    if (password) {
+        userData.password = password;
+    }
+
+    updateUserInDb(id, userData);
+}
+
+window.deleteUser = function(id) {
+    if (confirm("Are you sure you want to delete this user?")) {
+        deleteUserFromDb(id);
     }
 }
