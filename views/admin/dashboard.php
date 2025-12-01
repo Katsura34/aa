@@ -206,9 +206,6 @@ requireAdmin();
             </section>
 
             <section id="manage-users-content" class="content-section hidden max-w-5xl mx-auto">
-                <header class="text-center mb-10">
-                </header>
-
                 <div class="flex justify-center mb-6">
                     <button onclick="openAddUserModal()" class="px-6 py-3 bg-secondary text-white rounded-xl shadow-md hover:bg-green-700 transition duration-150 active:scale-95 flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
