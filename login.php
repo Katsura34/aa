@@ -1,9 +1,32 @@
 <?php
-include "db.php";
+require_once 'includes/session.php';
+require_once 'config/database.php';
 
-$username = $_POST["username"];
-$password = $_POST["password"];
-$role     = $_POST["role"];
+// Regenerate session ID for security
+session_regenerate_id(true);
+
+// Check if form was submitted
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: login.html");
+    exit;
+}
+
+// Sanitize and validate inputs
+$username = isset($_POST["username"]) ? sanitize($_POST["username"]) : '';
+$password = isset($_POST["password"]) ? $_POST["password"] : '';
+$role     = isset($_POST["role"]) ? sanitize($_POST["role"]) : '';
+
+// Validate inputs
+if (empty($username) || empty($password) || empty($role)) {
+    echo "<script>alert('All fields are required!'); window.location='login.html';</script>";
+    exit;
+}
+
+// Validate role
+if (!in_array($role, ['admin', 'customer'])) {
+    echo "<script>alert('Invalid role selected!'); window.location='login.html';</script>";
+    exit;
+}
 
 $sql = "SELECT * FROM users WHERE username = ? AND role = ?";
 $stmt = $conn->prepare($sql);
@@ -15,9 +38,16 @@ if ($result->num_rows === 1) {
     $user = $result->fetch_assoc();
 
     if (password_verify($password, $user['password_hash'])) {
-        session_start();
+        // Set session variables
         $_SESSION["user_id"] = $user["id"];
+        $_SESSION["username"] = $user["username"];
+        $_SESSION["email"] = $user["email"];
         $_SESSION["role"] = $user["role"];
+        $_SESSION["logged_in"] = true;
+        $_SESSION["login_time"] = time();
+        
+        // Set session timeout (30 minutes)
+        $_SESSION["timeout"] = time() + (30 * 60);
 
         if ($role === "admin") {
             header("Location: admin_dashboard.php");
@@ -26,9 +56,12 @@ if ($result->num_rows === 1) {
         }
         exit;
     } else {
-        echo "Incorrect password!";
+        echo "<script>alert('Incorrect password!'); window.location='login.html';</script>";
     }
 } else {
-    echo "User not found!";
+    echo "<script>alert('User not found!'); window.location='login.html';</script>";
 }
+
+$stmt->close();
+$conn->close();
 ?>
