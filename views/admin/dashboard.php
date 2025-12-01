@@ -62,6 +62,10 @@ requireAdmin();
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m18 0V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12m14 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10m16 4h2m-2-4h-2m-4 0h-2m4 4h2"></path></svg>
                     Sales Report
                 </button>
+                <button data-view="manage-users" class="nav-link w-full flex items-center p-3 rounded-xl transition duration-150 hover:bg-gray-100 text-gray-800">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path></svg>
+                    Manage Users
+                </button>
             </nav>
             
             <div class="mt-8 pt-4 border-t border-gray-200">
@@ -196,6 +200,78 @@ requireAdmin();
                         <div class="flex justify-end space-x-3 mt-4">
                             <button onclick="closeEditModal()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">Cancel</button>
                             <button onclick="updateItem()" class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-blue-700 transition">Update</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="manage-users-content" class="content-section hidden max-w-5xl mx-auto">
+                <header class="text-center mb-10">
+                </header>
+
+                <div class="flex justify-center mb-6">
+                    <button onclick="openAddUserModal()" class="px-6 py-3 bg-secondary text-white rounded-xl shadow-md hover:bg-green-700 transition duration-150 active:scale-95 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span class="font-bold">Add User</span>
+                    </button>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-list" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="no-users-message" class="text-center text-gray-500 p-8 hidden">No users found.</p>
+                </div>
+
+                <!-- Add User Modal -->
+                <div id="add-user-modal" class="fixed inset-0 bg-black/40 hidden flex justify-center items-center p-4 z-50 transition-opacity duration-300">
+                    <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl transition-transform duration-300 transform scale-100">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">Add New User</h2>
+
+                        <input id="user-username" type="text" placeholder="Username" class="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-primary focus:border-primary" />
+                        <input id="user-email" type="email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-primary focus:border-primary" />
+                        <input id="user-password" type="password" placeholder="Password" class="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-primary focus:border-primary" />
+                        <select id="user-role" class="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-primary focus:border-primary">
+                            <option value="customer">Customer</option>
+                            <option value="admin">Admin</option>
+                        </select>
+
+                        <div class="flex justify-end space-x-3 mt-4">
+                            <button onclick="closeAddUserModal()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">Cancel</button>
+                            <button onclick="addUser()" class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-blue-700 transition">Add</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit User Modal -->
+                <div id="edit-user-modal" class="fixed inset-0 bg-black/40 hidden flex justify-center items-center p-4 z-50 transition-opacity duration-300">
+                    <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl transition-transform duration-300 transform scale-100">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">Edit User</h2>
+                        <input type="hidden" id="edit-user-id" />
+                        <input id="edit-user-username" type="text" placeholder="Username" class="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-primary focus:border-primary" />
+                        <input id="edit-user-email" type="email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-primary focus:border-primary" />
+                        <input id="edit-user-password" type="password" placeholder="New Password (leave blank to keep current)" class="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-primary focus:border-primary" />
+                        <select id="edit-user-role" class="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-primary focus:border-primary">
+                            <option value="customer">Customer</option>
+                            <option value="admin">Admin</option>
+                        </select>
+
+                        <div class="flex justify-end space-x-3 mt-4">
+                            <button onclick="closeEditUserModal()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">Cancel</button>
+                            <button onclick="updateUser()" class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-blue-700 transition">Update</button>
                         </div>
                     </div>
                 </div>
